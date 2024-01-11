@@ -111,6 +111,7 @@ df_Propostaspf = spark.table('landingzonedadosdev.default.propostaspf')\
 
 # VALIDA CNPJ
 df_Propostaspf = df_Propostaspf.withColumn("FLG_CPF_VAL", identificar_campo_udf(df_Propostaspf["NUM_CPF"]))
+df_Propostaspf = df_Propostaspf.withColumn("NUM_CPF_LIMPO",regexp_replace(col("NUM_CPF").cast("string"), "[^0-9]", ""))
 df_Propostaspf = df_Propostaspf.withColumn("CEP_Limpo", regexp_replace(col("NUM_CEP"), "[^\\d]", ""))
 
 # COMMAND ----------
@@ -141,6 +142,7 @@ df_final = spark.sql("""
                         ,TIP_TEL01
                         ,NUM_TEL02
                         ,TIP_TEL02
+                        ,NUM_CPF_LIMPO
                         ,NUM_CEP
                         ,CEP_Limpo
                         ,DSC_END

@@ -112,7 +112,6 @@ df_Entidades = df_Entidades.withColumn("NUM_CNPJ_LIMPO",regexp_replace(col("NUM_
 df_Entidades = df_Entidades.withColumn("TIPO_DOCUMENTO", identificar_Tipo_campo_udf(df_Entidades["NUM_CNPJ_LIMPO"]))
 df_Entidades = df_Entidades.withColumn("CEP_Limpo", regexp_replace(col("NUM_CEP"), "[^\\d]", ""))
 
-
 # COMMAND ----------
 
 df_Entidades.createOrReplaceGlobalTempView("Entidades_temp_view")
@@ -145,6 +144,7 @@ df_Entidades_final = spark.sql("""
                         ,DATA_ATLC
                         ,FLG_CNPJ_VAL
                         ,TIPO_DOCUMENTO AS DSC_TIPO_DOC
+                        ,NUM_CNPJ_LIMPO
                         ,CEP_Limpo AS NUM_CEP_LIMPO
                         ,LOG_NO_LOG AS LOG_NO_LOG
                         ,BAI_NO_BAI AS NME_BRROI_VAL

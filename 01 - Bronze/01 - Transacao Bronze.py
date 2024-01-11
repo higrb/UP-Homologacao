@@ -108,6 +108,66 @@ df_transacao = spark.table('landingzonedadosdev.default.transacoes')\
 
 # COMMAND ----------
 
+# DBTITLE 1,Tabela CartoesUsuarios
+df_CartoesUsuarios = spark.table('bronzedev.default.CartoesUsuarios')\
+    .select(
+        'COD_CRT_USR',
+        'COD_CTA_USR' 
+        )
+
+
+# COMMAND ----------
+
+# DBTITLE 1,Tabela ContasUsuarios
+df_ContasUsuarios = spark.table('bronzedev.default.ContasUsuarios')\
+    .select(
+        'COD_CNT_USR',
+        'COD_PRP' 
+        )
+
+# COMMAND ----------
+
+# DBTITLE 1,Tabela propostaspf
+df_propostaspf = spark.table('bronzedev.default.propostaspf')\
+    .select(
+        'COD_PRP_PF',
+        'NUM_CPF_LIMPO'        
+        )
+
+# COMMAND ----------
+
+# DBTITLE 1,Tabela estabelecimentos
+df_estabelecimentos = spark.table('bronzedev.default.estabelecimentos')\
+    .select(
+        'COD_ESTAB',
+        'NUM_CNPJ_LIMPO',
+        'NUM_CNPJ_LIMPO_MAT'
+        )
+
+# COMMAND ----------
+
+# DBTITLE 1,Tabela entidades
+df_entidades = spark.table('bronzedev.default.entidades')\
+    .select(
+        'COD_ENT',
+        'NUM_CNPJ_LIMPO'
+        )
+
+# COMMAND ----------
+
+df_transacao = df_transacao.join(df_CartoesUsuarios, "COD_CRT_USR", "left_outer")
+df_transacao = df_transacao.join(df_ContasUsuarios, df_ContasUsuarios.COD_CNT_USR == df_transacao.COD_CTA_USR, "left_outer").drop(df_ContasUsuarios.COD_CNT_USR)
+df_transacao = df_transacao.join(df_propostaspf, df_propostaspf.COD_PRP_PF == df_transacao.COD_PRP, "left_outer").drop(df_transacao.COD_PRP)
+df_transacao = df_transacao.withColumnRenamed("NUM_CPF_LIMPO", "NUM_CPF_USU")
+df_transacao = df_transacao.join(df_estabelecimentos, "COD_ESTAB", "left_outer")
+df_transacao = df_transacao.withColumnRenamed("NUM_CNPJ_LIMPO", "NUM_CNPJ_ESTAB")
+df_transacao = df_transacao.withColumnRenamed("NUM_CNPJ_LIMPO_MAT", "NUM_CNPJ_ESTAB_MTRZ")
+df_transacao = df_transacao.join(df_entidades, "COD_ENT", "left_outer")
+df_transacao = df_transacao.withColumnRenamed("NUM_CNPJ_LIMPO", "NUM_CNPJ_ENT")
+df_transacao = df_transacao.dropDuplicates()
+
+# COMMAND ----------
+
 # Carregar a tabela Delta de destino como DeltaTable pelo nome do catálogo
 deltaTable = DeltaTable.forName(spark, "bronzedev.default.transacao")
 
@@ -121,7 +181,3 @@ deltaTable = DeltaTable.forName(spark, "bronzedev.default.transacao")
  .whenNotMatchedInsertAll() # Insere novas linhas que não correspondem
  .execute()
 )
-
-# COMMAND ----------
-
-

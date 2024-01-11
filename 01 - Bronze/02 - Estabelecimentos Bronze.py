@@ -175,6 +175,10 @@ df_estabelecimento_final = spark.sql("""
 
 # COMMAND ----------
 
+df_estabelecimento_final.write.mode("overwrite").saveAsTable('bronzedev.default.estabelecimentos')
+
+# COMMAND ----------
+
 # Carregar a tabela Delta de destino como DeltaTable pelo nome do catálogo
 deltaTable = DeltaTable.forName(spark, "bronzedev.default.estabelecimentos")
 
@@ -188,3 +192,14 @@ deltaTable = DeltaTable.forName(spark, "bronzedev.default.estabelecimentos")
  .whenNotMatchedInsertAll() # Insere novas linhas que não correspondem
  .execute()
 )
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC select count(1) from bronzedev.default.transacao t
+# MAGIC inner join bronzedev.default.estabelecimentos et on et.COD_ESTAB = t.COD_ESTAB
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC select count(1) from bronzedev.default.estabelecimentos--279.757 --279.785
