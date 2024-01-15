@@ -1,4 +1,9 @@
 # Databricks notebook source
+# MAGIC %md
+# MAGIC ## Notebook Responsavel por criar a dm_cli
+
+# COMMAND ----------
+
 # DBTITLE 1,Imports
 from pyspark.sql.functions import expr, regexp_replace, row_number, lit
 from pyspark.sql.window import Window
